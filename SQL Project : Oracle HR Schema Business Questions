@@ -1,0 +1,39 @@
+Between October 17, 2003 and March 10, 2005, name employees hired during this time. What is the total number? 
+
+--Query--
+SELECT first_name, last_name, to_char(hire_date, 'MM.DD.YYYY') AS "hire date"
+FROM hr.employees
+WHERE hire_date >= '17-OCT-03' AND hire_date <= '10-MAR-05'
+ORDER BY hire_date ASC;
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+What employees and job title work at our Southlake location?
+
+--Pre Query--
+SELECT D.department_id, D.department_name, L.location_id, L.city
+FROM hr.departments D
+JOIN hr.locations L
+ON D.location_id = L.location_id;
+
+--Main Query--
+SELECT first_name, last_name, employee_id, job_id, department_id
+FROM hr.employees
+WHERE department_id =
+  (SELECT department_id
+  FROM hr.departments
+  WHERE location_id =
+    (SELECT location_id
+    FROM hr.locations
+    WHERE city = 'SouthLake'));
+    
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Per department, what is the average years worked and average salary earned?
+
+--Query--
+SELECT department_name,
+        ROUND(AVG(MONTHS_BETWEEN(CURRENT_DATE, hire_date) / 12)) AS avg_yrs_worked,
+        ROUND(AVG(salary)) AS avg_salary
+FROM hr.employees e
+JOIN hr.departments d ON e.department_id = d.department_id
+GROUP BY department_name
+ORDER BY avg_yrs_worked ASC, avg_salary ASC;
